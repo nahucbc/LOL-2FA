@@ -27,10 +27,33 @@ class Mail:
         self.__mail.select('INBOX') # select inbox
         return
     
-    def __get_code(self) -> int:
+    def __check(self, list, other=None) -> str:
+        value = len(list)
+        values = []
+        for num in range(value):
+            try:
+                if len(list[num]) == 6:
+                    if list[num].isnumeric():
+                        values.append(list[num])
+                if other in list[num]:
+                    container = ''
+                    for word in list[num]:
+                        try:
+                            if word.isnumeric():
+                                container += word      
+                        except:
+                            continue
+                    
+                    values.append(container)
+            except:
+                continue
+        
+        return values
+    
+    def __get_code(self) -> str:
         
         _, msgnums = self.__mail.search(None, 
-                                 'UNSEEN', 
+                                 'UNSEEN',
                                  'FROM', 
                                  '<noreply@mail.accounts.riotgames.com>') # search message from riot games
         
@@ -45,19 +68,31 @@ class Mail:
             _, data = self.__mail.fetch(latest_number[0],
                              '(RFC822)') # get message from latest_number
             
-            code_2FA = (message_from_bytes(data[0][1]) # convert
-                .get('Subject')# get subject From Message
-                .split() # split it 
-                [1] # get part two of split where is the code-2FA
-                )
+            message = message_from_bytes(data[0][1])
             
+            code_2FA_subject = list(message['Subject'].split())
+            code_2FA_subject = self.__check(code_2FA_subject)[0]
+
+            for part in message.walk():
+                if part.get_content_type() == 'text/plain':
+                   bytes = part.get_payload(decode=True)
+                   charset = part.get_content_charset('iso-8859-1')
+                   chars = bytes.decode(charset, 'replace')
+                   code_2FA_content = chars.split()
+                   code_2FA_content = self.__check(code_2FA_content, other=code_2FA_subject)[0]
+            
+            if code_2FA_subject == code_2FA_content:
+                code_2FA = code_2FA_content
+                
         except IndexError:
             code_2FA = str('no new code')
         except UnboundLocalError:
             code_2FA = str('invalid var')
         
-        return code_2FA 
-    
+        finally:
+            return code_2FA
+            
+        
     def return_2FA(self):
         self.__select()
         return self.__get_code()
