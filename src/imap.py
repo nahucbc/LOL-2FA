@@ -85,9 +85,9 @@ class Mail:
                 code_2FA = code_2FA_content
                 
         except IndexError:
-            code_2FA = str('no new code')
+            code_2FA = str('No New Code')
         except UnboundLocalError:
-            code_2FA = str('invalid var')
+            code_2FA = str('Invalid Var')
         
         finally:
             return code_2FA
