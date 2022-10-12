@@ -91,8 +91,14 @@ class Mail:
         
         finally:
             return code_2FA
-            
-        
+    
+    def is_code(self, code):
+        self.__select()
+        if code != 'No New Code' and code != 'Invalid Var':
+            return True
+        if code == 'No New Code' or code == 'Invalid Var':
+            return False
+    
     def return_2FA(self):
         self.__select()
         return self.__get_code()
