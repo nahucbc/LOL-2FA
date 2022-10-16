@@ -1,5 +1,5 @@
 from imap import Mail
-from tkinter import DISABLED, NORMAL, Tk, messagebox, Toplevel
+from tkinter import DISABLED, NORMAL, Tk, messagebox
 from tkinter import ttk
 from PIL import Image
 from pystray import MenuItem as item
@@ -49,12 +49,17 @@ class Interface():
         self.__check.grid(column=2, row=3)
         
     def __add_set(self):
-        self.__source = Mail(host=self.__host_entry.get(),
+        try:
+            self.__source = Mail(host=self.__host_entry.get(),
                       port=self.__port_entry.get(),
                       user=self.__email_entry.get(),
                       password=self.__password_entry.get())
-        self.__check['state'] = NORMAL
-        self.__any_account = True
+            self.__source.connect()
+            self.__check['state'] = NORMAL
+            self.__any_account = True
+        except:
+            print('excepcion')
+            self.__source.disconnect()
         
     def __check_get(self, dialog=None):
         if self.__any_account == True:
