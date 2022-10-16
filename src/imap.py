@@ -12,17 +12,19 @@ class Mail:
         self.__port = port
         self.__user = user
         self.__password = password
-        self.__server()
-        self.__login()
 
-    def __server(self) -> None:
+        
+    def connect(self) -> None:
         self.__mail = IMAP4_SSL(host=str(self.__host), port=int(self.__port)) # connect to imap server
-        return
-    
-    def __login(self) -> None:
         self.__mail.login(user=self.__user, password=self.__password) # login with user and password
         return
     
+    def disconnect(self):
+        try:
+            self.__mail.close() 
+            self.__mail.logout()
+        except AttributeError:
+            pass
     def __select(self) -> None:
         self.__mail.select('INBOX') # select inbox
         return
@@ -94,7 +96,7 @@ class Mail:
     
     def is_code(self, code):
         self.__select()
-        if code != 'No New Code' and code != 'Invalid Var':
+        if code != 'No New Code' and code != 'Invalid Var':                     
             return True
         if code == 'No New Code' or code == 'Invalid Var':
             return False
