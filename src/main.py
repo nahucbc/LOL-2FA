@@ -6,18 +6,18 @@ from pystray import MenuItem as item
 import pystray
 import pyperclip
 
-class Interface():
+class Interface(Tk):
     def __init__(self) -> None:
-        self.__root = Tk()
+        super().__init__()
         self.__config()
         self.__widgets()
         self.__grid()
-        self.__root.mainloop()
+        self.mainloop()
         
     def __config(self) -> None:
-        self.__root.resizable(False, False)
-        self.__root.title('2FA')
-        self.__root.protocol('WM_DELETE_WINDOW', self.__hide)
+        self.resizable(False, False)
+        self.title('2FA')
+        self.protocol('WM_DELETE_WINDOW', self.__hide)
         self.__any_account = False
         
     def __widgets(self):
@@ -75,18 +75,18 @@ class Interface():
             
     #System Tray
     def __hide(self):
-        self.__root.withdraw()
+        self.withdraw()
         menu=(item('Check', self.__check_get), item('Show', self.__show), item('Quit', self.__quit))
         self.__icon =  pystray.Icon(name='LOL-2FA' ,title='LOL-2FA', icon=Image.open('hide.ico'), menu=menu)
         self.__icon.run()
     
     def __show(self):
         self.__icon.stop()
-        self.__root.after(0, self.__root.deiconify())
+        self.after(0, self.deiconify())
     
     def __quit(self):
         self.__icon.stop()
-        self.__root.destroy()
+        self.destroy()
 
     
 if __name__ == '__main__':
